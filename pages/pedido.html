@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e0f7fa;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .menu {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .menu ul {
+            list-style-type: none;
+            width: 100%;
+            padding: 0;
+        }
+
+        .menu li {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .menu a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .menu a:hover {
+            background-color: #0056b3;
+        }
+
+        .conteudo {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .campo {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #007BFF;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+            color: #007BFF;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="menu">
+            <h1>Menu</h1>
+            <ul>
+                <li><a href="#">Novo Pedido</a></li>
+                <li><a href="#">Mesas</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </div>
+        <div class="conteudo">
+            <h1>Novo Pedido</h1>
+            <form action="submit" id="form">
+                <div class="campo">
+                    <label for="nome">Nome Completo:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="campo">
+                    <label for="produtos">Comida:</label>
+                    <select id="produtos" name="produtos" required>
+                        <option value="">Selecione...</option>
+                        <option value="pizza">Pizza</option>
+                        <option value="hamburguer">Hambúrguer</option>
+                        <option value="sushi">Sushi</option>
+                        <option value="salada">Salada</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="bebidas">Bebida:</label>
+                    <select id="bebidas" name="bebidas" required>
+                        <option value="">Selecione...</option>
+                        <option value="refrigerante">Refrigerante</option>
+                        <option value="suco">Suco</option>
+                        <option value="cerveja">Cerveja</option>
+                        <option value="agua">Água</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="combos">Combo:</label>
+                    <select id="combos" name="combos">
+                        <option value="">Selecione...</option>
+                        <option value="combo1">Combo 1 (Pizza + Refrigerante)</option>
+                        <option value="combo2">Combo 2 (Hambúrguer + Suco)</option>
+                        <option value="combo3">Combo 3 (Sushi + Cerveja)</option>
+                        <option value="combo4">Combo 4 (Salada + Água)</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="mesa">Mesa:</label>
+                    <input type="number" id="mesa" name="mesa" required>
+                </div>
+                <div class="campo">
+                    <label for="comentarios">Comentários Adicionais:</label>
+                    <textarea id="comentarios" name="comentarios" rows="4"></textarea>
+                </div>
+                <button type="submit" id="botao">Confirmar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        chamaDados()
+        enviarDados()
+
+        function enviarDados(){
+            const formulario = document.getElementById("form")
+            formulario.addEventListener('submit', (e) =>{  
+                e.preventDefault()
+                const Url = 'http://localhost:3000'
+
+                const formData = new FormData(formulario)
+
+                const pedido = {};
+                formData.forEach((value, key) => {
+                    pedido[key] = value;
+                });
+
+                console.log(pedido)
+
+                
+                        // Se o nome não existe na mesa, envia o pedido
+                        axios.post(`${Url}/comandas`, pedido)
+                            .then((response) => {
+                                console.log(response.data);
+                                alert('Pedido enviado com sucesso!');
+                            })
+                            .catch((error) => {
+                                console.error('Erro ao enviar pedido:', error);
+                                alert('Erro ao enviar pedido. Por favor, tente novamente mais tarde.');
+                            });
+                    
+            });
+        }
+        
+
+        function chamaDados(){
+            document.addEventListener('DOMContentLoaded', () => {
+                const Url = 'http://localhost:3000'
+
+                const comida = document.getElementById('produtos');
+                const bebida = document.getElementById('bebidas');
+                const combo = document.getElementById('combos');
+
+
+
+                axios.get(Url+'/produtos')
+                    .then((response) => {
+                        comida.innerHTML = '<option value="">Selecione...</option>'
+                        const dados = response.data
+                        
+                        if(dados.length>0){
+                            dados.forEach(item => {
+                                const option = document.createElement('option')
+                                option.value = item._id;
+                                option.textContent = `${item.produto} - Valor: R$${item.valor.toFixed(2)}`
+                                comida.appendChild(option)
+                            })
+                        }
+                        else{
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'sem produtos cadastrados';
+                            comida.appendChild(option);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('erro na recuperação de dados:', error);
+                        // Adicionar uma opção de erro
+                        comida.innerHTML = '<option value="">Error</option>';
+                    }) 
+                    //campo de bebidas
+                    axios.get(Url+'/bebidas')
+                    .then((response) => {
+                        bebida.innerHTML = '<option value="">Selecione...</option>'
+                        const dados = response.data
+                    
+                        if(dados.length>0){
+                            dados.forEach(item => {
+                                const option = document.createElement('option')
+                                option.value = item._id;
+                                option.textContent = `${item.bebida} - Valor: R$${item.valor.toFixed(2)}`
+                                bebida.appendChild(option)
+                            })
+                        }
+                        else{
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'sem produtos cadastrados';
+                            bebida.appendChild(option);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('erro na recuperação de dados:', error);
+                        // Adicionar uma opção de erro
+                        bebida.innerHTML = '<option value="">Error</option>';
+                    }) 
+
+                    //campo de combos
+                    axios.get(Url+'/combos')
+                    .then((response) => {
+                        combo.innerHTML = '<option value="">Selecione...</option>'
+                        const dados = response.data
+                        
+                        if(dados.length>0){
+                            dados.forEach(item => {
+                                const option = document.createElement('option')
+                                option.value = item._id;
+                                option.textContent = `${item.combo} - Valor: R$${item.valor.toFixed(2)}`
+                                combo.appendChild(option)
+                            })
+                        }
+                        else{
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'sem produtos cadastrados';
+                            combo.appendChild(option);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('erro na recuperação de dados:', error);
+                        // Adicionar uma opção de erro
+                        combo.innerHTML = '<option value="">Error</option>';
+                    }) 
+            })
+        }
+    </script>
+</body>
+</html>
