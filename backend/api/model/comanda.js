@@ -10,12 +10,17 @@ const comandaSchema = new mongoose.Schema(
     [ 
         {
         id: {type: SchemaTypes.ObjectId},
-        nome: {type: String},
-        mesa: {type:Number},
-        produtos: [produto.schema],
-        bebidas: [bebida.schema],
-        combos: [combo.schema],
-        comentarios: {type: String}
+        cliente: [
+            {
+                nome: {type: String},
+                mesa: {type:Number},
+                produtos: [produto.schema],
+                bebidas: [bebida.schema],
+                combos: [combo.schema],
+                comentarios: [{type: String}]
+        
+            }
+            ]    
         }
     ]
 )

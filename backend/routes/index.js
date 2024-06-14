@@ -3,6 +3,7 @@ import produto from './produtoRoute.js'
 import comanda from './comandaRoute.js'
 import bebida from './bebidaRoute.js'
 import combo from './comboRoute.js'
+import usuario from "./usuarioRoute.js";
 
 
 const routes = (app) => {
@@ -15,7 +16,8 @@ const routes = (app) => {
         produto,
         comanda,
         bebida,
-        combo
+        combo,
+        usuario
     )
 }
 
