@@ -7,8 +7,8 @@ const router = express.Router()
 
 router
     .get('/comandas', comandaController.listarcomanda)
-    .get('/comandas/:id', comandaController.verificarSeExistePessoaNaComanda)   
-    .get('/comandas/:mesa/pedidos', comandaController.listaComandaMesa)
+    .get('/comandas/:mesa', comandaController.verificarSeExistePessoaNaComanda)   
+    // .get('/comandas/:mesa/pedidos', comandaController.listaComandaMesa)
     .post('/comandas', comandaController.criarcomanda)
     .put('/comandas/:id', comandaController.Atualizarcomanda)
     .delete('/comandas/:id', comandaController.excluircomanda)

@@ -8,8 +8,8 @@ const form = document.getElementById("form")
 
             
             axios.post('/login', {
-                login,
-                pass
+                login: login,
+                pass: pass
             })
             .then(response => {
                 if (response.status === 200) {

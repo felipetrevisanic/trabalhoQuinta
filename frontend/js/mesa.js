@@ -4,64 +4,44 @@ function abrirModal(mesaNumero) {
     const modalMesaNumero = document.getElementById('mesa-numero');
     const modalDespesas = document.getElementById('mesa-despesas');
 
-
-    
     // Atualiza o número da mesa no modal
     modalMesaNumero.textContent = mesaNumero;
 
-    console.log(mesaNumero)
-
     // Faz uma requisição para o backend para obter os detalhes da comanda
-    axios.get(`http://localhost:3000/comandas?mesa=${mesaNumero}`)
+    axios.get(`http://localhost:3000/comandas/${mesaNumero}`)
         .then(response => {
-            const comanda = response.data[0]; // Supondo que apenas uma comanda seja retornada
-
-            // Calcula o total das despesas (produtos, bebidas e combos)
-            let totalDespesas = 0;
-
-            // Verifica se há produtos e calcula o total
-            if (comanda.produtos && comanda.produtos.length > 0) {
-                comanda.produtos.forEach(produto => {
-                    if (produto.valor) { // Verifica se o valor está definido
-                        totalDespesas += produto.valor;
-                    }
+            const despesas = response.data; // Lista com o nome e o valor total de cada cliente
+            console.log(despesas)
+            // Calcula o total das despesas da mesa
+            if (despesas.message) {
+                modalDespesas.textContent = despesas.message;
+            } else {
+                // Calcula o total das despesas da mesa
+                let clienteNome = []
+                let totalDespesas = 0;
+                despesas.forEach(cliente => {
+                    totalDespesas += cliente.valorTotal;
+                    clienteNome.push(cliente.nome)
                 });
-            }
 
-            // Verifica se há bebidas e calcula o total
-            if (comanda.bebidas && comanda.bebidas.length > 0) {
-                comanda.bebidas.forEach(bebida => {
-                    if (bebida.valor) { // Verifica se o valor está definido
-                        totalDespesas += bebida.valor;
-                    }
-                });
+                console.log(clienteNome)
+                // Atualiza o total das despesas no modal apenas para a mesa selecionada
+                if (clienteNome !== undefined) {
+                    modalDespesas.textContent = clienteNome + ' R$' +  totalDespesas.toFixed(2); // Exibe o total com duas casas decimais
+                } else {
+                    modalDespesas.textContent = 'Nome do cliente indisponível' + ' R$' +  totalDespesas.toFixed(2);
+                }
+            
             }
-
-            // Verifica se há combos e calcula o total
-            if (comanda.combos && comanda.combos.length > 0) {
-                comanda.combos.forEach(combo => {
-                    if (combo.valor) { // Verifica se o valor está definido
-                        totalDespesas += combo.valor;
-                    }
-                });
-            }
-
-            // Atualiza o total das despesas no modal apenas para a mesa selecionada
-            modalDespesas.textContent = totalDespesas.toFixed(2); // Exibe o total com duas casas decimais
         })
         .catch(error => {
+            modalDespesas.textContent = 'Não há comandas vinculadas a esta'
             console.error('Erro ao recuperar despesas da mesa:', error);
         })
         .finally(() => {
             // Exibe o modal após a requisição (caso tenha ocorrido algum erro, o modal não será exibido)
             modal.style.display = 'flex'; // Define o estilo display como flex
         });
-}
-
-// Função para fechar o modal
-function fecharModal() {
-    const modal = document.getElementById('modal');
-    modal.style.display = 'none';
 }
 
 // Evento de clique para abrir o modal ao clicar em uma mesa
@@ -78,4 +58,10 @@ function pagar() {
     console.log('Pagamento realizado com sucesso!');
     // Feche o modal após o pagamento
     fecharModal();
+}
+
+// Função para fechar o modal
+function fecharModal() {
+    const modal = document.getElementById('modal');
+    modal.style.display = 'none';
 }
