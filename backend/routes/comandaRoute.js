@@ -10,7 +10,7 @@ router
     .get('/comandas/:mesa', comandaController.verificarSeExistePessoaNaComanda)   
     // .get('/comandas/:mesa/pedidos', comandaController.listaComandaMesa)
     .post('/comandas', comandaController.criarcomanda)
-    .put('/comandas/:id', comandaController.Atualizarcomanda)
+    .put('/comandas/:mesa', comandaController.Atualizarcomanda)
     .delete('/comandas/:id', comandaController.excluircomanda)
 
 

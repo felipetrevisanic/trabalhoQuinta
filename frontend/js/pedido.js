@@ -18,13 +18,16 @@ function enviarDados(){
     
     const Url = 'http://localhost:3000'; // Altere o URL conforme necessário
 
+    
+
     const pedido = {
         mesa: mesa.value,
         cliente: {
             nome: nome.value,
-            produtos: [produto.value], // Supondo que produto, bebida e combo sejam IDs ou algo similar
-            bebidas: [bebida.value],
-            combos: [combo.value],
+            // Inclua apenas os campos que não são vazios
+            ...(produto.value.trim() && { produtos: [produto.value] }),
+            ...(bebida.value.trim() && { bebidas: [bebida.value] }),
+            ...(combo.value.trim() && { combos: [combo.value] }),
             comentarios: [comentario.value]
         }
     };

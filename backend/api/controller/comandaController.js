@@ -30,23 +30,26 @@ class comandaController {
         }
 
         const resultados = comandaExistente.cliente.map(cliente => {
-            const totalProdutos = cliente.produtos.reduce((acc, produto) => acc + (produto.valor || 0), 0);
-            const totalBebidas = cliente.bebidas.reduce((acc, bebida) => acc + (bebida.valor || 0), 0);
-            const totalCombos = cliente.combos.reduce((acc, combo) => acc + (combo.valor || 0), 0);
-
-            const valorTotal = totalProdutos + totalBebidas + totalCombos;
-            
-            console.log(cliente.produtos);
-            console.log(totalProdutos);
-            console.log(totalBebidas);
-            console.log(totalCombos);
-
-            return {
-                nome: cliente.nome,
-                valorTotal: valorTotal
-            };
-        });
-
+          const produtos = cliente.produtos.filter(produto => produto.valor !== null);
+          const bebidas = cliente.bebidas.filter(bebida => bebida.valor !== null);
+          const combos = cliente.combos.filter(combo => combo.valor !== null);
+      
+          const totalProdutos = produtos.reduce((acc, produto) => acc + produto.valor, 0);
+          const totalBebidas = bebidas.reduce((acc, bebida) => acc + bebida.valor, 0);
+          const totalCombos = combos.reduce((acc, combo) => acc + combo.valor, 0);
+      
+          const valorTotal = totalProdutos + totalBebidas + totalCombos;
+      
+          console.log(produtos);
+          console.log(totalProdutos);
+          console.log(totalBebidas);
+          console.log(totalCombos);
+      
+          return {
+              nome: cliente.nome,
+              valorTotal: valorTotal
+          };
+      });
         console.log(resultados);
 
         return res.status(200).json(resultados);
@@ -96,72 +99,74 @@ static criarcomanda = async (req, res) => {
       const comandaExistente = await comanda.findOne({ mesa });
 
       if (comandaExistente) {
-          console.log('Comanda existe');
-
-          const produtos = await produto.find({ _id: { $in: cliente.produtos } });
-          const bebidas = await bebida.find({ _id: { $in: cliente.bebidas } });
-          const combos = await combo.find({ _id: { $in: cliente.combos } });
-
-          // Atualizar a comanda existente com os dados fornecidos
-          let clienteExistente = comandaExistente.cliente.find(c => c.nome === cliente.nome);
-              
-          if (clienteExistente) {
-              if (cliente.produtos && cliente.produtos.length > 0) {
-                  clienteExistente.produtos.push(...cliente.produtos);
-              }
-
-              if (cliente.bebidas && cliente.bebidas.length > 0) {
-                  clienteExistente.bebidas.push(...cliente.bebidas);
-              }
-
-              if (cliente.combos && cliente.combos.length > 0) {
-                  clienteExistente.combos.push(...cliente.combos);
-              }
-
-              if (cliente.comentarios && cliente.comentarios.length > 0) {
-                  clienteExistente.comentarios.push(...cliente.comentarios);
-              }
-          } else {
-              // Adicionar novo cliente se não existir
-              const novoClienteObj = {
-                  nome: cliente.nome,
-                  produtos: produtos || [],
-                  bebidas: bebidas || [],
-                  combos: combos || [],
-                  comentarios: cliente.comentario || []
-                  };
-                  console.log('Novo cliente adicionado:', novoClienteObj);
-                  comandaExistente.cliente.push(novoClienteObj);
-          }
-          console.log('Comanda existente:', comandaExistente);
-
-          await comandaExistente.save();
-          return res.status(200).json({ message: 'Comanda atualizada com sucesso.' });
-      } else {
-          console.log('Comanda não existe');
-
-          // Criar uma nova comanda com os dados recebidos
-          const produtos = await produto.find({ _id: { $in: cliente.produtos } });
-          const bebidas = await bebida.find({ _id: { $in: cliente.bebidas } });
-          const combos = await combo.find({ _id: { $in: cliente.combos } });
-
-          const novoClienteObj = {
-              nome: cliente.nome,
-              produtos,
-              bebidas,
-              combos,
-              comentarios: cliente.comentarios || []
-          };
-
-          // Criar uma nova comanda com os dados construídos
-          const novaComanda = new comanda({
-              mesa: parseInt(mesa, 10), // Converter 'mesa' para número
-              cliente: [novoClienteObj] // Aqui, fornecemos o novo cliente em um array
-          });
-
-          await novaComanda.save();
-          return res.status(201).json({ message: 'Comanda criada com sucesso.' });
-      }
+        console.log('Comanda existe');
+    
+        // Buscar os detalhes dos produtos, bebidas e combos no banco de dados
+        const produtos = await produto.find({ _id: { $in: cliente.produtos } });
+        const bebidas = await bebida.find({ _id: { $in: cliente.bebidas } });
+        const combos = await combo.find({ _id: { $in: cliente.combos } });
+    
+        // Atualizar a comanda existente com os dados fornecidos
+        let clienteExistente = comandaExistente.cliente.find(c => c.nome === cliente.nome);
+    
+        if (clienteExistente) {
+            // Atualizar os detalhes do cliente existente
+            if (cliente.produtos && cliente.produtos.length > 0) {
+                clienteExistente.produtos.push(...produtos);
+            }
+    
+            if (cliente.bebidas && cliente.bebidas.length > 0) {
+                clienteExistente.bebidas.push(...bebidas);
+            }
+    
+            if (cliente.combos && cliente.combos.length > 0) {
+                clienteExistente.combos.push(...combos);
+            }
+    
+            if (cliente.comentarios && cliente.comentarios.length > 0) {
+                clienteExistente.comentarios.push(...cliente.comentarios);
+            }
+        } else {
+            // Adicionar novo cliente se não existir
+            const novoClienteObj = {
+                nome: cliente.nome,
+                produtos: produtos || [],
+                bebidas: bebidas || [],
+                combos: combos || [],
+                comentarios: cliente.comentario || []
+            };
+            console.log('Novo cliente adicionado:', novoClienteObj);
+            comandaExistente.cliente.push(novoClienteObj);
+        }
+        console.log('Comanda existente:', comandaExistente);
+    
+        await comandaExistente.save();
+        return res.status(200).json({ message: 'Comanda atualizada com sucesso.' });
+    } else {
+        console.log('Comanda não existe');
+    
+        // Buscar os detalhes dos produtos, bebidas e combos no banco de dados
+        const produtos = await produto.find({ _id: { $in: cliente.produtos } });
+        const bebidas = await bebida.find({ _id: { $in: cliente.bebidas } });
+        const combos = await combo.find({ _id: { $in: cliente.combos } });
+    
+        const novoClienteObj = {
+            nome: cliente.nome,
+            produtos,
+            bebidas,
+            combos,
+            comentarios: cliente.comentarios || []
+        };
+    
+        // Criar uma nova comanda com os dados construídos
+        const novaComanda = new comanda({
+            mesa: parseInt(mesa, 10), // Converter 'mesa' para número
+            cliente: [novoClienteObj] // Aqui, fornecemos o novo cliente em um array
+        });
+    
+        await novaComanda.save();
+        return res.status(201).json({ message: 'Comanda criada com sucesso.' });
+    }
   } catch (error) {
       console.error('Erro ao criar comanda:', error);
       res.status(500).send({ message: 'Não foi possível inserir a comanda.' });
@@ -169,29 +174,44 @@ static criarcomanda = async (req, res) => {
 };
 
 
-  static Atualizarcomanda = async (req, res) => {
-    const id = req.params.id;
-    try {
-      await comanda.findByIdAndUpdate(id, { $set: req.body });
-      res.status(200).send({ message: "comanda atualizado com sucesso" });
-    } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error} - não foi possivel atulizar comanda` });
-    }
-  };
+static Atualizarcomanda = async (req, res) => {
+  const mesa = req.params.mesa;
+  const { nomeCliente } = req.body;
 
-  static excluircomanda = async (req, res) => {
-    const id = req.params.id;
-    try {
-      await comanda.findByIdAndDelete(id);
-      res.status(200).send({ message: `comanda excluido com sucesso` });
-    } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error} - não foi possivel excluir comanda` });
+  try {
+    const novaComanda = await comanda.findOne({ mesa: mesa });
+    if (!novaComanda) {
+      return res.status(404).send({ message: 'Comanda não encontrada' });
     }
-  };
+
+    // Remove o cliente da lista de clientes
+    novaComanda.cliente = novaComanda.cliente.filter(cliente => cliente.nome !== nomeCliente);
+
+    // Se não houver mais clientes, exclui a comanda
+    if (novaComanda.cliente.length === 0) {
+      await comanda.findOneAndDelete({ mesa: mesa });
+      return res.status(200).send({ message: 'Comanda excluída com sucesso' });
+    }
+
+    // Salva a comanda atualizada
+    await novaComanda.save();
+    res.status(200).send({ message: 'Cliente removido e comanda atualizada com sucesso' });
+  } catch (error) {
+    console.error(error); // Adicione esta linha para logar o erro no servidor
+    res.status(500).send({ message: `${error} - Não foi possível atualizar a comanda` });
+  }
+};
+
+static excluircomanda = async (req, res) => {
+  const mesa = req.params.mesa;
+  try {
+    await comanda.findOneAndDelete({ mesa: mesa });
+    res.status(200).send({ message: 'Comanda excluída com sucesso' });
+  } catch (error) {
+    console.error(error); // Adicione esta linha para logar o erro no servidor
+    res.status(500).send({ message: `${error} - Não foi possível excluir a comanda` });
+  }
+};
 }
 
 export default comandaController;
