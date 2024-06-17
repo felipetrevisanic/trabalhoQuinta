@@ -13,23 +13,19 @@ class usuarioController {
   };
 
   static fazerLogin = async (req, res) => {
-    const { login, senha } = req.body;
+    const { login, pass } = req.body;
 
     try {
-      const usuario = await Usuario.findOne({ login });
-
-      if (!usuario) {
-        return res.status(404).json({ message: "Usuário não encontrado" });
-      }
-
-      const senhaCorreta = await usuario.verificarSenha(senha);
-
-      if (!senhaCorreta) {
-        return res.status(401).json({ message: "Credenciais inválidas" });
-      }
-      res.status(200).json({ message: "Login bem-sucedido" });
+        console.log(login)
+        const user = await usuario.findOne({ login, pass });
+        if (user) {
+            res.status(200).json({ message: 'Login successful' });
+        } else {
+            res.status(401).json({ message: 'Invalid username or password' });
+        }
     } catch (error) {
-      res.status(500).json({ message: `${error} - Não foi possível fazer o login` });
+        console.error('Erro ao fazer login:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
   };
 
