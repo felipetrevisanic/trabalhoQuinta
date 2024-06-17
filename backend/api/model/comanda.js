@@ -1,28 +1,23 @@
-import mongoose, { SchemaTypes } from "mongoose";
-import AutoIncrementFactory from 'mongoose-sequence';
+import mongoose from 'mongoose';
 import produto from './produto.js'
 import bebida from './bebida.js'
 import combo from './combo.js'
 
-const AutoIncrement = AutoIncrementFactory(mongoose);
-
-const comandaSchema = new mongoose.Schema(
-    [ 
-        {
-        id: {type: SchemaTypes.ObjectId},
-        nome: {type: String},
-        mesa: {type:Number},
-        produtos: [produto.schema],
-        bebidas: [bebida.schema],
-        combos: [combo.schema],
-        comentarios: {type: String}
-        }
-    ]
-)
-
-comandaSchema.plugin(AutoIncrement, { inc_field: 'comanda' });
+const comandaSchema = new mongoose.Schema({
+        mesa: { type: Number, required: true },
+        cliente: 
+        [
+            {
+                nome: { type: String, required: true },
+                produtos: [{ type: produto.schema }],
+                bebidas: [{ type: bebida.schema }],
+                combos: [{ type: combo.schema }],
+                comentarios: [{ type: String }]
+            }
+        ] 
+});
 
 
-const comanda = mongoose.model('comandas', comandaSchema)
+const Comanda = mongoose.model('Comanda', comandaSchema);
 
-export default comanda
+export default Comanda;
